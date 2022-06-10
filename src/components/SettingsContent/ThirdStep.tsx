@@ -74,25 +74,25 @@ export default function ThirdStep() {
   }, []);
 
   const titleInputHandler = (childKey: number, key: number, e: any) => {
-    const childData: menuChildData[] = menuData.childData.map((child) => {
-      if (childKey === child.key) {
-        child.items.map((el) => {
-          if (el.key === key) {
-            return {
-              ...el,
-              label: e.target.value,
-            };
-          } else {
-            return el;
-          }
-        });
-      } else {
-        return child;
-      }
-    });
-    if (childData != undefined) {
-      setMenuData({...menuData, childData: childData});
-    }
+    // const childData: menuChildData[] = menuData.childData.map((child) => {
+    //   if (childKey === child.key) {
+    //     child.items.map((el) => {
+    //       if (el.key === key) {
+    //         return {
+    //           ...el,
+    //           label: e.target.value,
+    //         };
+    //       } else {
+    //         return el;
+    //       }
+    //     });
+    //   } else {
+    //     return child;
+    //   }
+    // });
+    // if (childData != undefined) {
+    //   setMenuData({...menuData, childData: childData});
+    // }
   };
   return (
     <Box style={{marginLeft: 48, marginTop: 24}}>

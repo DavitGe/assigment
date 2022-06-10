@@ -74,7 +74,7 @@ export default function ThirdStep() {
   }, []);
 
   const titleInputHandler = (childKey: number, key: number, e: any) => {
-    const childData = menuData.childData.map((child) => {
+    const childData: menuChildData[] = menuData.childData.map((child) => {
       if (childKey === child.key) {
         child.items.map((el) => {
           if (el.key === key) {

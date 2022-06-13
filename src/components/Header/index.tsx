@@ -6,10 +6,10 @@ import {Box} from '@fluentui/react-northstar';
 import {Link} from 'react-router-dom';
 
 import {MenuIcon, MoreIcon} from '@fluentui/react-icons-northstar';
-import {menuData, menuLocalData} from '../../interfaces';
+import {dataType, menuData, menuLocalData} from '../../interfaces';
 import InfoBox from './InfoBox';
 
-import {initialValue as data} from '../../initialValue';
+// import {initialValue as data} from '../../initialValue';
 
 export function randomNumberInRange(min: number, max: number): number {
   // 👇️ get number between min (inclusive) and max (inclusive)
@@ -23,10 +23,11 @@ const initialState: menuData[] = [
     items: '',
   },
 ];
-
-export default function Header() {
+interface Props {
+  data: dataType;
+}
+export default function Header({data}: Props) {
   const [menuData, setMenuData] = useState(initialState);
-
   useEffect(() => {
     const fetchedData = data.menuData.map((el: menuLocalData) => {
       const fetchedChildData: menuData[] = el.childData.map((chEl) => {
@@ -74,7 +75,8 @@ export default function Header() {
         items: <div>MoreIcon</div>,
       },
     ]);
-  }, []);
+  }, [data]);
+
   return (
     <Box
       style={{

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Box,
   Form,
@@ -9,11 +9,22 @@ import {
 } from '@fluentui/react-northstar';
 import {useNavigate} from 'react-router-dom';
 
-export default function SeccondStep() {
+export default function SecondStep() {
   const navigate = useNavigate();
   const [menuItem, setMenuItem] = useState('');
-  const [subMenu, setSubMenu] = useState([{key: 0, content: ''}]);
+  const [subMenu, setSubMenu] = useState([{key: 0, label: ''}]);
 
+  useEffect(() => {
+    try {
+      setMenuItem(localStorage.getItem('menuItem') || '');
+      setSubMenu(
+        JSON.parse(localStorage.getItem('subMenu') || '[{key: 0, label: ""}]')
+      );
+    } catch (e: any) {
+      alert(e.message);
+    }
+    //eslint-disable-next-line
+  }, []);
   const menuInputHandler = (e: any) => {
     setMenuItem(e.target.value);
   };
@@ -23,7 +34,7 @@ export default function SeccondStep() {
       if (el.key === key) {
         return {
           key: key,
-          content: e.target.value,
+          label: e.target.value,
         };
       } else {
         return el;
@@ -34,7 +45,7 @@ export default function SeccondStep() {
 
   const createSubMenu = () => {
     const temp = subMenu[subMenu.length - 1];
-    setSubMenu([...subMenu, {key: temp.key + 1, content: ''}]);
+    setSubMenu([...subMenu, {key: temp.key + 1, label: ''}]);
   };
 
   const removeSubMenu = () => {
@@ -47,7 +58,7 @@ export default function SeccondStep() {
     if (menuItem === '') {
       return false;
     }
-    return !subMenu.find((el) => el.content === '');
+    return !subMenu.find((el) => el.label === '');
   };
 
   const onSubmit = () => {
@@ -74,7 +85,7 @@ export default function SeccondStep() {
         <Header as="h3" content="Add navigation entries" />
         <Text weight="regular" size="medium" content="Fill these inputs:" />
       </Box>
-      <Form style={{height: 'auto', marginTop: 32}} onSubmit={onSubmit}>
+      <Form style={{height: 'auto', marginTop: 32}}>
         <FormInput
           label="Menu item:"
           name="menuItem"
@@ -99,11 +110,10 @@ export default function SeccondStep() {
                     label="Submenu items:"
                     name="subMenuItem"
                     key={el.key}
-                    value={el.content}
+                    value={el.label}
                     onChange={(e: any) => subMenuInputHandler(el.key, e)}
-                    required
                     style={{marginTop: 8}}
-                    showSuccessIndicator={false}
+                    showSuccessIndicator={true}
                   />
                 );
               } else {
@@ -111,11 +121,10 @@ export default function SeccondStep() {
                   <FormInput
                     name="subMenuItem"
                     key={el.key}
-                    value={el.content}
+                    value={el.label}
                     onChange={(e: any) => subMenuInputHandler(el.key, e)}
-                    required
                     style={{marginTop: 8}}
-                    showSuccessIndicator={false}
+                    showSuccessIndicator={true}
                   />
                 );
               }
@@ -136,7 +145,7 @@ export default function SeccondStep() {
             />
           </Box>
         </Box>
-        <Button content="Next >" primary type="submit" />
+        <Button content="Next >" primary type="submit" onClick={onSubmit} />
       </Form>
     </Box>
   );

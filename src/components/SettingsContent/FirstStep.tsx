@@ -10,9 +10,8 @@ import {
   List,
 } from '@fluentui/react-northstar';
 import {Link} from 'react-router-dom';
-import {initialValue as data} from '../../initialValue';
-import {panelData} from '../../interfaces';
-import SaveChanges from './SaveChanges';
+// import {initialValue as data} from '../../initialValue';
+import {dataType, panelData} from '../../interfaces';
 
 const initialData: panelData[] = [
   {
@@ -22,7 +21,10 @@ const initialData: panelData[] = [
   },
 ];
 
-export default function FirstStep() {
+interface Props {
+  data: dataType;
+}
+export default function FirstStep({data}: Props) {
   const [menuData, setMenuData] = useState(initialData);
   useEffect(() => {
     const panels: panelData[] = data.menuData.map((el) => {
@@ -33,7 +35,6 @@ export default function FirstStep() {
             header: child.content,
           };
         });
-        console.log('childItems', childItems);
         return {
           key: elCh.key,
           title: elCh.label,
@@ -48,7 +49,6 @@ export default function FirstStep() {
     });
     setMenuData([...panels]);
   }, []);
-  console.log('menuData', menuData);
   return (
     <Box style={{marginLeft: 48, marginTop: 24}}>
       <Box>
@@ -81,7 +81,6 @@ export default function FirstStep() {
       <Box style={{marginTop: 32}}>
         <Accordion panels={menuData} />
       </Box>
-      <SaveChanges />
     </Box>
   );
 }

@@ -1,8 +1,22 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Form, FormInput, Header, Text} from '@fluentui/react-northstar';
+import {
+  Box,
+  Form,
+  FormInput,
+  Header,
+  Button,
+  Text,
+} from '@fluentui/react-northstar';
 
-import {menuLocalData, menuChildData} from '../../interfaces';
+import {menuLocalData} from '../../interfaces';
 import {randomNumberInRange} from '../Header';
+import SaveChanges from './SaveChanges';
+
+type HTMLElementEvent<T extends HTMLElement> = Event & {
+  target: T;
+  // probably you might want to add the currentTarget as well
+  // currentTarget: T;
+};
 
 const initialData: menuLocalData = {
   label: '',
@@ -30,106 +44,201 @@ const initialData: menuLocalData = {
 export default function ThirdStep() {
   const [menuData, setMenuData] = useState(initialData);
 
-  let lSubMenu = localStorage.getItem('subMenu');
-  let menuItem = localStorage.getItem('menuItem') || '';
-
-  let subMenu = [{key: 0, content: ''}];
-
-  if (menuItem === '') {
-    alert('Fill step 2!');
-  }
-
-  if (lSubMenu !== null) {
-    subMenu = JSON.parse(lSubMenu);
-  } else {
-    alert('Fill step 2!');
-    subMenu = [{key: 0, content: ''}];
-  }
+  const [menuItem, setMenuItem] = useState('');
+  const [subMenu, setSubMenu] = useState([{key: 0, label: ''}]);
 
   useEffect(() => {
-    if (menuData === initialData) {
-      setMenuData({
-        label: menuItem,
-        key: randomNumberInRange(1, 10000),
-        childData: subMenu.map((e) => {
-          return {
-            label: e.content,
-            key: e.key,
-            items: [
-              {
-                content: '',
-                key: randomNumberInRange(1, 10000),
-                items: [
-                  {
-                    key: randomNumberInRange(1, 10000),
-                    header: '',
-                  },
-                ],
-              },
-            ],
-          };
-        }),
-      });
-    }
+    setMenuItem(
+      localStorage.getItem('menuItem') || 'Please fill previous parts!'
+    );
+
+    setSubMenu(
+      JSON.parse(localStorage.getItem('subMenu') || JSON.stringify(subMenu))
+    );
+
+    // const finalSubMenu = subMenu.map((el) => {
+    //   console.log('el.label', el.label);
+    //   return {
+    //     key: el.key,
+    //     label: el.label,
+    //     items: [
+    //       {
+    //         content: '',
+    //         key: randomNumberInRange(1, 10000),
+    //         items: [
+    //           {
+    //             key: randomNumberInRange(1, 10000),
+    //             header: '',
+    //           },
+    //         ],
+    //       },
+    //     ],
+    //   };
+    // });
+    // setMenuData({
+    //   label: menuItem,
+    //   key: randomNumberInRange(1, 10000),
+    //   childData: finalSubMenu,
+    // });
+    //eslint-disable-next-line
   }, []);
 
-  const titleInputHandler = (childKey: number, key: number, e: any) => {
-    // const childData: menuChildData[] = menuData.childData.map((child) => {
-    //   if (childKey === child.key) {
-    //     child.items.map((el) => {
-    //       if (el.key === key) {
-    //         return {
-    //           ...el,
-    //           label: e.target.value,
-    //         };
-    //       } else {
-    //         return el;
-    //       }
-    //     });
-    //   } else {
-    //     return child;
-    //   }
-    // });
-    // if (childData != undefined) {
-    //   setMenuData({...menuData, childData: childData});
-    // }
+  useEffect(() => {
+    const finalSubMenu = subMenu.map((el) => {
+      return {
+        key: el.key,
+        label: el.label,
+        items: [
+          {
+            content: '',
+            key: randomNumberInRange(1, 10000),
+            items: [
+              {
+                key: randomNumberInRange(1, 10000),
+                header: '',
+              },
+            ],
+          },
+        ],
+      };
+    });
+    setMenuData({
+      label: menuItem,
+      key: randomNumberInRange(1, 10000),
+      childData: finalSubMenu,
+    });
+  }, [subMenu]);
+
+  interface infoHandlerProps {
+    childIndex: number;
+    infoIndex: number;
+    e: HTMLElementEvent<HTMLTextAreaElement>;
+  }
+
+  interface itemHandlerProps {
+    childIndex: number;
+    infoIndex: number;
+    itemIndex: number;
+    e: HTMLElementEvent<HTMLTextAreaElement>;
+  }
+
+  interface addItemProps {
+    childIndex: number;
+    infoIndex: number;
+  }
+  const infoInputHandler = ({childIndex, infoIndex, e}: infoHandlerProps) => {
+    let temp = menuData.childData;
+    temp[childIndex].items[infoIndex].content = e.target.value;
+
+    setMenuData({...menuData, childData: temp});
   };
+
+  const itemInputHandler = ({
+    childIndex,
+    infoIndex,
+    itemIndex,
+    e,
+  }: itemHandlerProps) => {
+    let temp = menuData.childData;
+    temp[childIndex].items[infoIndex].items[itemIndex].header = e.target.value;
+    setMenuData({...menuData, childData: temp});
+  };
+
+  const addTitle = (childIndex: number) => {
+    let temp = menuData.childData;
+    temp[childIndex].items.push({
+      content: '',
+      key: randomNumberInRange(1, 10000),
+      items: [
+        {
+          header: '',
+          key: randomNumberInRange(1, 10000),
+        },
+      ],
+    });
+    setMenuData({...menuData, childData: temp});
+  };
+
+  const addItem = ({childIndex, infoIndex}: addItemProps) => {
+    let temp = menuData.childData;
+    temp[childIndex].items[infoIndex].items.push({
+      header: '',
+      key: randomNumberInRange(1, 10000),
+    });
+    setMenuData({...menuData, childData: temp});
+  };
+
   return (
     <Box style={{marginLeft: 48, marginTop: 24}}>
       <Box>
-        <Header as="h2" content="Finish creating new item!" />
+        <Header content={menuItem} />
         <Text
           weight="regular"
           size="medium"
           content="Fill little more inputs:"
         />
       </Box>
-      <Box>
+      <Form>
         {menuData.childData.map((el) => {
-          if (el.label === '') {
-            return <Text content="Please fill step 2!" />;
-          }
           return (
-            <Form key={el.key}>
-              <Header content={el.label} as="h3" />
+            <Box>
+              <Header content={el.label} />
               {el.items.map((info) => {
                 return (
-                  <FormInput
-                    label="Title:"
-                    name="Title"
-                    key={info.key}
-                    value={info.content}
-                    onChange={(e: any) =>
-                      titleInputHandler(el.key, info.key, e)
-                    }
-                    style={{marginTop: 8}}
-                  />
+                  <Box key={info.key}>
+                    <Header as="h3" content="Title:" />
+                    <FormInput
+                      value={info.content}
+                      onChange={(e: any) => {
+                        infoInputHandler({
+                          childIndex: menuData.childData.indexOf(el),
+                          infoIndex: el.items.indexOf(info),
+                          e,
+                        });
+                      }}
+                    />
+                    <Header as="h3" content="Items: " />
+                    {info.items.map((item) => {
+                      return (
+                        <FormInput
+                          style={{marginTop: 4}}
+                          key={item.key}
+                          value={item.header}
+                          onChange={(e: any) => {
+                            itemInputHandler({
+                              childIndex: menuData.childData.indexOf(el),
+                              infoIndex: el.items.indexOf(info),
+                              itemIndex: info.items.indexOf(item),
+                              e,
+                            });
+                          }}
+                        />
+                      );
+                    })}
+                    <Button
+                      onClick={() => {
+                        addItem({
+                          childIndex: menuData.childData.indexOf(el),
+                          infoIndex: el.items.indexOf(info),
+                        });
+                      }}
+                      content="Add item"
+                      style={{marginTop: 6}}
+                    />
+                  </Box>
                 );
               })}
-            </Form>
+              <Button
+                onClick={() => addTitle(menuData.childData.indexOf(el))}
+                content="Add Title"
+                style={{marginTop: 12}}
+                primary
+              />
+            </Box>
           );
         })}
-      </Box>
+      </Form>
+      <SaveChanges data={menuData} />
     </Box>
   );
 }

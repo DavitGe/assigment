@@ -1,17 +1,21 @@
 import React from 'react';
 import {useParams} from 'react-router-dom';
+import {dataType} from '../../interfaces';
 
 import FirstStep from './FirstStep';
-import SeccondStep from './SeccondStep';
+import SecondStep from './SecondStep';
 import ThirdStep from './ThirdStep';
 
-export default function SettingsContent() {
+interface Props {
+  data: dataType;
+}
+export default function SettingsContent({data}: Props) {
   const {step} = useParams();
   switch (Number(step)) {
     case 1:
-      return <FirstStep />;
+      return <FirstStep data={data} />;
     case 2:
-      return <SeccondStep />;
+      return <SecondStep />;
     case 3:
       return <ThirdStep />;
     default:
